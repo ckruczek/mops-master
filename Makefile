@@ -23,16 +23,17 @@ clean:
 	$(call RM, *.o )
 	$(call RM, startup/*.o )
 	$(call RM, core/devices/*.o )
-
+	$(call RM, core/scheduler/*.o )
 OBJS=startup/arm_irq.o  \
 	core/devices/p_vic.o \
 	core/devices/vic.o core/devices/timer.o core/devices/p_timer.o\
 	core/devices/uart.o core/devices/p_uart.o \
+	core/scheduler/scheduler.o \
 	startup/vector_mapping.o startup/arm_init.o main.o  startup/startup.o startup/initstacks.o
 
 HEADERS=include/devices/timer.h include/devices/uart.h \
 		include/system/arm_init.h include/system/arm_irq.h \
-		include/system/vic.h
+		include/system/vic.h include/system/scheduler.h
 
 $(TARGET): $(OBJS)
 	$(LD) $(LDFLAGS) $(LINKFILE) -o $(TARGET) $(OBJS) 
@@ -57,9 +58,8 @@ core/devices/p_vic.o: core/devices/p_vic.c $(HEADERS)
 	$(CC) $(CCFLAGS) core/devices/p_vic.c -o core/devices/p_vic.o
 core/devices/p_timer.o: core/devices/p_timer.c $(HEADERS)
 	$(CC) $(CCFLAGS) core/devices/p_timer.c -o core/devices/p_timer.o
-#versatile/periphs/p_vic2.o: versatile/periphs/p_vic2.c 
-#	$(CC) $(CCFLAGS) versatile/periphs/p_vic2.c -o versatile/periphs/p_vic2.o
-
+core/scheduler/scheduler.o: core/scheduler/scheduler.c $(HEADERS)
+	$(CC) $(CCFLAGS) core/scheduler/scheduler.c -o core/scheduler/scheduler.o
 # ASSEMBLER STUFF GOES HERE
 startup/startup.o: startup/startup.s
 	$(AS) $(ASFLAGS) startup/startup.s -o startup/startup.o

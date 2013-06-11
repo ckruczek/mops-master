@@ -11,7 +11,6 @@ void main(void)
 
 	arm_init();
 	init_vic();
-//	init_svic();
 	init_uart();
 	init_timer();
  	uart_print("=================\n");
