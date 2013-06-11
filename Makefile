@@ -1,5 +1,5 @@
-TARGET=system.elf
-BIN=system.bin
+TARGET=mops.elf
+BIN=mops.bin
 LINKFILE=link.ld
 
 CC=arm-none-linux-gnueabi-gcc
