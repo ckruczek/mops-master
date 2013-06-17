@@ -106,35 +106,6 @@ ARM_irq:
 /* IRQ exit }}} */
     .size   ARM_irq, . - ARM_irq
     .endfunc
-	
-	.global	ARM_isr_handler
-	.func	ARM_isr_handler
-ARM_isr_handler:
-	
-	sub lr, lr, #4
-	stmfd sp!, {lr}
-	mrs r12, spsr
-	stmfd sp!, {r12}
-	ldr r0, =primary_vic
-	// load the vectaddr register
-	ldr r1, [r0, #0x30]
-	// branch to the isr function
-	msr cpsr_c, #0x1F
-	stmfd sp!, {r0-r3, lr}
-//	bl arm_irq
-	mov lr, pc
-	bx r1
-	ldmfd sp!, {r0-r3, lr}
-	msr cpsr_c, #0x92
-	ldmfd sp!, {r12}
-	msr spsr_cxsf, r12
-	ldmfd sp!, {lr}
-	str r0, [r1]
-	subs pc, lr, #4
-
-
-	.size ARM_isr_handler, . - ARM_isr_handler
-	.endfunc
 /*****************************************************************************
 * void ARM_fiq(void);
 */

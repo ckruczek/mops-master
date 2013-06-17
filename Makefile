@@ -24,7 +24,7 @@ clean:
 	$(call RM, startup/*.o )
 	$(call RM, core/devices/*.o )
 	$(call RM, core/scheduler/*.o )
-OBJS=startup/arm_irq.o  \
+OBJS=ramdisk.o startup/arm_irq.o  \
 	core/devices/p_vic.o \
 	core/devices/vic.o core/devices/timer.o core/devices/p_timer.o\
 	core/devices/uart.o core/devices/p_uart.o \
@@ -33,10 +33,14 @@ OBJS=startup/arm_irq.o  \
 
 HEADERS=include/devices/timer.h include/devices/uart.h \
 		include/system/arm_init.h include/system/arm_irq.h \
-		include/system/vic.h include/system/scheduler.h
+		include/system/vic.h include/system/scheduler.h \
+		ramdisk.h
 
 $(TARGET): $(OBJS)
 	$(LD) $(LDFLAGS) $(LINKFILE) -o $(TARGET) $(OBJS) 
+
+ramdisk.o: ramdisk.c $(HEADERS)
+	$(CC) $(CCFLAGS) ramdisk.c -o ramdisk.o
 
 main.o:	main.c $(HEADERS)
 	$(CC) $(CCFLAGS) main.c -o main.o
