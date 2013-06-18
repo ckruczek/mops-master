@@ -46,7 +46,6 @@ ARM_irq2:
 	ldr r0, =primary_vic
 	// on offset 0x30 is the vector address for the current isr
 	ldr r1, [r0,#0x30]
-	mov r2, #100
 	stmfd sp!, {r0-r2,lr}
 	mov lr, pc
 	bx r1
@@ -59,9 +58,33 @@ ARM_irq2:
 	ldmfd sp!, {pc}^
 	.size ARM_irq2, . - ARM_irq2
 	.endfunc
+
 /*****************************************************************************
-* void ARM_irq(void);
+* void ARM_swi(void);
 */
+    .global ARM_swi
+    .func   ARM_swi
+ARM_swi:
+	sub sp,sp,#4
+	stmfd sp!, {r0-r12,lr}
+	mrs r2, spsr
+	str r2, [sp, #14*4]
+	mov r1, sp
+	ldr r0, [lr, #-4]
+	bic r0,r0,#0xFF000000
+	bl mops_trap_handler
+	ldr r2, [sp,#14*4]
+	msr spsr_csxf, r2
+	ldmfd sp!,{r0-r12,lr}
+	add sp, sp, #4
+	movs pc,lr
+   .size   ARM_swi, . - ARM_swi
+    .endfunc
+
+/*****************************************************************************
+* 
+void ARM_irq(void);*/
+
     .global ARM_irq
     .func   ARM_irq
 ARM_irq:
@@ -84,7 +107,7 @@ ARM_irq:
 /* IRQ entiry }}} */
 //	bl arm_irq
 // ldmfd sp!, {fp, pc}
-	bl ARM_isr_handler
+//	bl ARM_isr_handler
 //    ldr r12, =arm_irq
 //	mov	lr,	pc
 //	bx  r12                 /* call the C IRQ-handler (ARM/THUMB) */
@@ -177,18 +200,6 @@ ARM_undef:
     B       ARM_except
     .size   ARM_undef, . - ARM_undef
     .endfunc
-
-/*****************************************************************************
-* void ARM_swi(void);
-*/
-    .global ARM_swi
-    .func   ARM_swi
-ARM_swi:
-    LDR     r0,Csting_swi
-    B       ARM_except
-    .size   ARM_swi, . - ARM_swi
-    .endfunc
-
 /*****************************************************************************
 * void ARM_pAbort(void);
 */
