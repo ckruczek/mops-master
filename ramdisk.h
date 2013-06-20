@@ -1,1 +1,1 @@
-extern const int ramdisk[136];
+extern const char ramdisk[24];

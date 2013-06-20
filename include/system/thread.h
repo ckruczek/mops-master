@@ -17,6 +17,7 @@ typedef struct Thread
 	int id;
 	enum 
 	{
+		UNDEFINED,
 		NEW,
 		RUNNING,
 		WAITING,
@@ -29,6 +30,8 @@ typedef struct Thread
 } Thread;
 
 Thread threadTable[MAX_THREADS];
+
+int mops_create_thread_layout(uint32_t*, uint32_t*, Thread*);
 
 
 
