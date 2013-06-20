@@ -6,15 +6,6 @@
 
 typedef struct sched_task
 {
-	enum 
-	{
-		NEW,
-		RUNNING,
-		WAITING,
-		READY,
-		TERMINATED
-
-	} state; 
 	uint32_t id;
 	uint32_t prio;
 
