@@ -8,7 +8,7 @@ uart.c - This is the uart module. It contains code used to deal
 ***************************************************************/
 
 #include "uart.h"
-
+#include "syscalls.h"
 /****************************************************************
 init_uart - This function handles initialisation in the uart, by
             setting the constants used to defined the baud rate, 
@@ -17,12 +17,13 @@ init_uart - This function handles initialisation in the uart, by
 
 void isr_uart()
 {
-
+	
 //	asm("mov r0, #88");
 //	asm("swi 0x0");
 	board_uart.InterruptClear |= UART_MASK_RXIM;
 	vic_clear_interrupt(UART0_INTENABLE);
-	uart_send_char((char)board_uart.DataRegister);
+//	uart_send_char((char)board_uart.DataRegister);
+	mops_trap_writeC((char)board_uart.DataRegister);
 	vic_enable_interrupt(UART0_INTENABLE);
 }
 
