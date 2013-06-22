@@ -1,7 +1,7 @@
-#include <stdio.h>
 
 void func()
 {	
-	printf("hello world!\n");
+	int i = 0;
+	asm("mov r0, #42");
 
 }

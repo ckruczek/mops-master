@@ -25,6 +25,7 @@ clean:
 	$(call RM, core/devices/*.o )
 	$(call RM, core/scheduler/*.o )
 OBJS=ramdisk.o startup/arm_irq.o  \
+	core/mops_change_proc.o \
 	core/devices/p_vic.o \
 	core/devices/vic.o core/devices/timer.o core/devices/p_timer.o\
 	core/devices/uart.o core/devices/p_uart.o \
@@ -77,3 +78,5 @@ startup/arm_irq.o: startup/arm_irq.s
 	$(AS) $(ASFLAGS) startup/arm_irq.s -o startup/arm_irq.o
 startup/initstacks.o: startup/initstacks.s
 	$(AS) $(ASFLAGS) startup/initstacks.s -o startup/initstacks.o
+core/mops_change_proc.o: core/mops_change_proc.s
+	$(AS) $(ASFLAGS) core/mops_change_proc.s -o core/mops_change_proc.o

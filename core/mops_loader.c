@@ -1,5 +1,5 @@
 #include "mops_loader.h"
-
+#include "mops_change_proc.h"
 void mops_load_ramdisk()
 {
 	extern uint8_t __heap_start;
@@ -9,15 +9,12 @@ void mops_load_ramdisk()
 	int i = 0;
 	for(; i < length; i++)
 		*dst++ = ramdisk[i];
+
+
 	
 	if(mops_create_thread_layout(&__heap_start, dst, &t) != -1)
 	{
-		int i = 0;
-	}
-	else
-	{
-		int i = 100;
+		MOPS_change_proc(&t);
 	}
 
-//	dst = &__heap_start;
 }
