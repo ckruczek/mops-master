@@ -1,20 +1,25 @@
 #include "mops_loader.h"
-#include "mops_change_proc.h"
+#include "mops_create_thread.h"
+
 void mops_load_ramdisk()
 {
-	extern uint8_t __heap_start;
+	extern uint32_t __k_heap_start;
 	int length = sizeof(ramdisk) / sizeof(ramdisk[0]);
-	char* dst = &__heap_start;
-	Thread t;
+
+	uint32_t* start= &__k_heap_start;
+	uint32_t* dst = &__k_heap_start;
 	int i = 0;
 	for(; i < length; i++)
 		*dst++ = ramdisk[i];
 
+	Thread t;
+	t.data.start = start;
+	t.data.end = dst;
+	t.data.sp = dst - 12;
+	mops_create_thread(&t);
+}
 
-	
-	if(mops_create_thread_layout(&__heap_start, dst, &t) != -1)
-	{
-		MOPS_change_proc(&t);
-	}
-
+void mops_create_thread(Thread *thread)
+{
+	MOPS_create_thread(thread);
 }

@@ -7,10 +7,10 @@ AS=arm-none-linux-gnueabi-as
 LD=arm-none-linux-gnueabi-ld
 OBJCOPY=arm-none-linux-gnueabi-objcopy
 
-CCFLAGS=-O0 -c -mcpu=arm926ej-s -g -Iinclude/devices -Iinclude/system -I.
+CCFLAGS=-c -mcpu=arm926ej-s -g -Iinclude/devices -Iinclude/system -I.
 ASFLAGS=-mcpu=arm926ej-s -g
 LDFLAGS=-T
-OBJCOPYFLAGS=-O binary
+OBJCOPYFLAGS=-O binary -S
 
 RM=rm -f $(1)
 
@@ -25,7 +25,7 @@ clean:
 	$(call RM, core/devices/*.o )
 	$(call RM, core/scheduler/*.o )
 OBJS=ramdisk.o startup/arm_irq.o  \
-	core/mops_change_proc.o \
+	core/mops_create_thread.o \
 	core/devices/p_vic.o \
 	core/devices/vic.o core/devices/timer.o core/devices/p_timer.o\
 	core/devices/uart.o core/devices/p_uart.o \

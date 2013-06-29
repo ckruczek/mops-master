@@ -22,7 +22,6 @@ void mops_trap_handler(uint32_t trapNumber, uint32_t *sp)
 void mops_trap_writeC(uint32_t character)
 {
 	asm("swi 0x0");	
-//	uart_send_char((char)character);
 
 }
 

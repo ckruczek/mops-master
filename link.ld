@@ -44,9 +44,9 @@ SECTIONS
 		__svc_stack_top = .;
 		
 
-		__heap_start = .;
+		__k_heap_start = .;
 		. += 0x1000;
-		__heap_end = .;
+		__k_heap_end = .;
 
 	. = 0x10140000;
 	primary_vic =ABSOLUTE(.);
