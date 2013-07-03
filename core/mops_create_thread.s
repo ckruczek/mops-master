@@ -11,7 +11,10 @@ MOPS_create_thread:
 	ldr sp, [r0,#0x10]
 	stmfd sp!, {r0-r12,lr}
 	// this loads the end pointer to r2, this is needed to set stackpointer and programmcounter
-	ldr pc, [r0,#0x08]
+
+	ldr r1, [r0,#0x08]
+	mov lr,pc
+	bx r1
 	// r0 contains the address to the thread,
 	// r0 + 0x08 -> thread start address
 	// r0 + 0x0c -> thread end address

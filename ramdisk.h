@@ -1,2 +1,2 @@
 #include <stdint.h>
-extern const uint16_t  ramdisk[530];
+extern const uint32_t  ramdisk[546];

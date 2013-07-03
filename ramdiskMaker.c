@@ -1,11 +1,14 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <regex.h>
 
-typedef uint8_t BUFFER_TYPE;
-const char* BUFFER_NAME = "uint16_t";
+typedef uint16_t BUFFER_TYPE;
+typedef uint32_t FINAL_BUFFER_TYPE;
 
-void writeRamDisk(uint16_t *buffer, unsigned long bufferSize, int stackSize)
+const char* BUFFER_NAME = "uint32_t";
+
+void writeRamDisk(FINAL_BUFFER_TYPE *buffer, unsigned long bufferSize, int stackSize)
 {
 	FILE *ramDisk;
 	ramDisk = fopen("ramdisk.h", "w+");
@@ -24,7 +27,7 @@ void writeRamDisk(uint16_t *buffer, unsigned long bufferSize, int stackSize)
 		if(i < bufferSize)
 			fprintf(ramDisk,"%#x",buffer[i]);
 		else
-			fprintf(ramDisk, "%#x", (uint16_t)0x00);
+			fprintf(ramDisk, "%#x", (FINAL_BUFFER_TYPE)0x00);
 
 		if(i != bufferPlusStack - 1)
 			fprintf(ramDisk,"%s",",");
@@ -35,13 +38,11 @@ void writeRamDisk(uint16_t *buffer, unsigned long bufferSize, int stackSize)
 	fclose(ramDisk);
 }
 
-void convertToUint16(uint8_t *buffer, size_t length,uint16_t *newBuffer)
+void convertToUint32(BUFFER_TYPE *buffer, size_t length, FINAL_BUFFER_TYPE *newBuffer)
 {
-
-	for(int i = 0,j=0; i < length; i+=2, j++)
+	for(int i = 0, j = 0; i < length; i+=2,j++)
 	{
-		newBuffer[j] = ((uint16_t)buffer[i] << 8) | buffer[i+1];
-		
+		newBuffer[j] = ((FINAL_BUFFER_TYPE)buffer[i+1] << 16 | buffer[i]);
 	}
 }
 
@@ -66,9 +67,9 @@ void readFile(const char* name)
 	{
 		printf("Size of buffer type %i\n", sizeof(BUFFER_TYPE));
 		size_t result = fread(buffer,sizeof(BUFFER_TYPE),fileLen ,file);
-		uint16_t *finalBuffer = (uint16_t*)malloc((fileLen/ 2) * sizeof(uint16_t));
-		convertToUint16(buffer, fileLen,finalBuffer);		
-
+		size_t bufferLength = (fileLen * sizeof(FINAL_BUFFER_TYPE)) / sizeof(FINAL_BUFFER_TYPE);
+		FINAL_BUFFER_TYPE *finalBuffer = (FINAL_BUFFER_TYPE*)malloc(bufferLength);
+		convertToUint32(buffer,fileLen, finalBuffer);
 		fclose(file);
 		if(result != fileLen)
 		{
@@ -76,7 +77,7 @@ void readFile(const char* name)
 			free(buffer);
 			return;
 		}
-		writeRamDisk(finalBuffer, fileLen / 2, 512);
+		writeRamDisk(finalBuffer, bufferLength , 512);
 		printf("Finished writing ramdisk.h\n");
 		free(buffer);
 
@@ -88,7 +89,7 @@ void readFile(const char* name)
 
 int main(int argc, char* argv[])
 {
-
+	
 		if(argc > 1)
 		{
 			readFile(argv[1]);

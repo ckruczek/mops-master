@@ -10,10 +10,6 @@
 	.eabi_attribute 34, 0
 	.eabi_attribute 18, 4
 	.file	"test.c"
-	.section	.rodata
-	.align	2
-.LC0:
-	.ascii	"hello world!\000"
 	.text
 	.align	2
 	.global	func
@@ -22,17 +18,21 @@ func:
 	.fnstart
 	@ args = 0, pretend = 0, frame = 0
 	@ frame_needed = 1, uses_anonymous_args = 0
-	stmfd	sp!, {fp, lr}
-	.save {fp, lr}
-	.setfp fp, sp, #4
-	add	fp, sp, #4
-	ldr	r0, .L2
-	bl	puts
-	ldmfd	sp!, {fp, pc}
-.L3:
-	.align	2
-.L2:
-	.word	.LC0
+	@ link register save eliminated.
+	str	fp, [sp, #-4]!
+	.save {fp}
+	.setfp fp, sp, #0
+	add	fp, sp, #0
+#APP
+@ 5 "test.c" 1
+	mov r0, #65
+@ 0 "" 2
+@ 6 "test.c" 1
+	swi 0x0
+@ 0 "" 2
+	add	sp, fp, #0
+	ldmfd	sp!, {fp}
+	bx	lr
 	.fnend
 	.size	func, .-func
 	.ident	"GCC: (Sourcery CodeBench Lite 2013.05-24) 4.7.3"

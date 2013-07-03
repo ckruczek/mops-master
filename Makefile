@@ -6,8 +6,10 @@ CC=arm-none-linux-gnueabi-gcc
 AS=arm-none-linux-gnueabi-as
 LD=arm-none-linux-gnueabi-ld
 OBJCOPY=arm-none-linux-gnueabi-objcopy
+RAMDISK=./ramdiskMaker.o test.bin
 
 CCFLAGS=-c -mcpu=arm926ej-s -g -Iinclude/devices -Iinclude/system -I.
+CCLINKFLAGS=-efunc -nostdlib -nodefaultlibs
 ASFLAGS=-mcpu=arm926ej-s -g
 LDFLAGS=-T
 OBJCOPYFLAGS=-O binary -S
@@ -17,11 +19,25 @@ RM=rm -f $(1)
 all: $(TARGET)
 	$(OBJCOPY) $(OBJCOPYFLAGS) $(TARGET) $(BIN)
 
-rebuild: clean all
+
+rebuild: clean all KLAUS
+
+###### Klaus stuff #####
+KLAUSFILES=test.o test.bin
+
+KLAUS:$(KLAUSFILES)
+	$(call RAMDISK)
+
+test.o: test.c 
+	$(CC) $(CCFLAGS) $(CCLINKFLAGS) test.c -o test.o	
+test.bin: test.o
+	$(OBJCOPY) $(OBJCOPYFLAGS) test.o test.bin
+###### Klaus Stuff #####
 
 clean:
-	$(call RM, *.o )
 	$(call RM, startup/*.o )
+	$(call RM, core/*.o )
+	$(call RM, core/syscalls/*.o)
 	$(call RM, core/devices/*.o )
 	$(call RM, core/scheduler/*.o )
 OBJS=ramdisk.o startup/arm_irq.o  \
