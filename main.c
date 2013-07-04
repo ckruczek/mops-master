@@ -11,9 +11,9 @@ void main(void)
 
 
 	arm_init();
-//	init_vic();
+	init_vic();
 //	init_uart();
-//	init_timer();
+	init_timer();
 	mops_load_ramdisk();
  	uart_print("=================\n");
 	uart_print("Registered all important services, system is ready!\n");

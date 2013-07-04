@@ -30,9 +30,9 @@ ARM_int_disable:
 	msr cpsr, r0
 	ldmfd sp!, {r0,pc}
 
-	.global ARM_irq2
-	.func	ARM_irq2
-ARM_irq2:
+	.global ARM_irq
+	.func	ARM_irq
+ARM_irq:
 	// change to irq mode and disable interrupts
 	// save old status
 	mrs r0, spsr
@@ -56,7 +56,7 @@ ARM_irq2:
 	ldmfd sp!, {r0,r1,lr}
 	msr spsr_cxsf, r0
 	ldmfd sp!, {pc}^
-	.size ARM_irq2, . - ARM_irq2
+	.size ARM_irq, . - ARM_irq
 	.endfunc
 
 /*****************************************************************************
@@ -79,55 +79,6 @@ ARM_swi:
 	add sp, sp, #4
 	movs pc,lr
    .size   ARM_swi, . - ARM_swi
-    .endfunc
-
-/*****************************************************************************
-* 
-void ARM_irq(void);*/
-
-    .global ARM_irq
-    .func   ARM_irq
-ARM_irq:
-/* IRQ entry {{{ */
-	MOV     r13,r0              /* save r0 in r13_IRQ */
-    SUB     r0,lr,#4            /* put return address in r0_SYS */
-    MOV     lr,r1               /* save r1 in r14_IRQ (lr) */
-    MRS     r1,spsr             /* put the SPSR in r1_SYS */
-
-    MSR     cpsr_c,#(SYS_MODE | NO_IRQ) /* SYSTEM, no IRQ, but FIQ enabled! */
-    STMFD   sp!,{r0,r1}         /* save SPSR and PC on SYS stack */
-    STMFD   sp!,{r2-r3,r12,lr}  /* save APCS-clobbered regs on SYS stack */
-    MOV     r0,sp               /* make the sp_SYS visible to IRQ mode */
-    SUB     sp,sp,#(2*4)        /* make room for stacking (r0_SYS, r1_SYS) */
-
-    MSR     cpsr_c,#(IRQ_MODE | NO_IRQ) /* IRQ mode, IRQ/FIQ disabled */
-    STMFD   r0!,{r13,r14}       /* finish saving the context (r0_SYS,r1_SYS)*/
-
-    MSR     cpsr_c,#(SYS_MODE | NO_IRQ) /* SYSTEM mode, IRQ disabled */
-/* IRQ entiry }}} */
-//	bl arm_irq
-// ldmfd sp!, {fp, pc}
-//	bl ARM_isr_handler
-//    ldr r12, =arm_irq
-//	mov	lr,	pc
-//	bx  r12                 /* call the C IRQ-handler (ARM/THUMB) */
- 		
-/* IRQ exit {{{ */
-    MSR     cpsr_c,#(SYS_MODE | NO_INT) /* SYSTEM mode, IRQ/FIQ disabled */
-    MOV     r0,sp               /* make sp_SYS visible to IRQ mode */
-    ADD     sp,sp,#(8*4)        /* fake unstacking 8 registers from sp_SYS */
-
-    MSR     cpsr_c,#(IRQ_MODE | NO_INT) /* IRQ mode, both IRQ/FIQ disabled */
-    MOV     sp,r0               /* copy sp_SYS to sp_IRQ */
-    LDR     r0,[sp,#(7*4)]      /* load the saved SPSR from the stack */
-    MSR     spsr_cxsf,r0        /* copy it into spsr_IRQ */
-
-    LDMFD   sp,{r0-r3,r12,lr}^  /* unstack all saved USER/SYSTEM registers */
-    NOP                         /* can't access banked reg immediately */
-    LDR     lr,[sp,#(6*4)]      /* load return address from the SYS stack */
-	MOVS    pc,lr               /* return restoring CPSR from SPSR */
-/* IRQ exit }}} */
-    .size   ARM_irq, . - ARM_irq
     .endfunc
 /*****************************************************************************
 * void ARM_fiq(void);

@@ -19,7 +19,7 @@ void mops_load_ramdisk()
 	mops_create_thread(&t);
 }
 
-void mops_create_thread(Thread *thread)
+void mops_create_thread(uint32_t *threadAddr)
 {
-	MOPS_create_thread(thread);
+	MOPS_create_thread(threadAddr);
 }

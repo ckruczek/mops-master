@@ -6,6 +6,6 @@
 #include "thread.h"
 
 void mops_load_ramdisk();
-void mops_create_thread(Thread *thread);
+void mops_create_thread(uint32_t *threadAddr);
 
 #endif

@@ -2,11 +2,12 @@ TARGET=mops.elf
 BIN=mops.bin
 LINKFILE=link.ld
 
+KLAUSNAME=klaus
 CC=arm-none-linux-gnueabi-gcc
 AS=arm-none-linux-gnueabi-as
 LD=arm-none-linux-gnueabi-ld
 OBJCOPY=arm-none-linux-gnueabi-objcopy
-RAMDISK=./ramdiskMaker.o test.bin
+RAMDISK=./ramdiskMaker.o $(KLAUSNAME).bin
 
 CCFLAGS=-c -mcpu=arm926ej-s -g -Iinclude/devices -Iinclude/system -I.
 CCLINKFLAGS=-efunc -nostdlib -nodefaultlibs
@@ -23,15 +24,15 @@ all: $(TARGET)
 rebuild: clean all KLAUS
 
 ###### Klaus stuff #####
-KLAUSFILES=test.o test.bin
+KLAUSFILES=$(KLAUSNAME).o $(KLAUSNAME).bin
 
 KLAUS:$(KLAUSFILES)
 	$(call RAMDISK)
 
-test.o: test.c 
-	$(CC) $(CCFLAGS) $(CCLINKFLAGS) test.c -o test.o	
-test.bin: test.o
-	$(OBJCOPY) $(OBJCOPYFLAGS) test.o test.bin
+$(KLAUSNAME).o: $(KLAUSNAME).c 
+	$(CC) $(CCFLAGS) $(CCLINKFLAGS) $(KLAUSNAME).c -o $(KLAUSNAME).o	
+$(KLAUSNAME).bin: $(KLAUSNAME).o
+	$(OBJCOPY) $(OBJCOPYFLAGS) $(KLAUSNAME).o $(KLAUSNAME).bin
 ###### Klaus Stuff #####
 
 clean:
