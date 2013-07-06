@@ -29,23 +29,23 @@ SECTIONS
  	.bss : { *(.bss COMMON) }
 
 		. = ALIGN(4);
-		. += 0x1000;
+		. += 0x2000;
 		stack_top = .;
  		. += 0x2000; 
  		__sys_stack_top = .;
 		
-		. += 0x1000;
+		. += 0x2000;
  		__irq_stack_top = .;
 		
-		. += 0x1000;
+		. += 0x2000;
 		__fiq_stack_top = .;
 
-		. += 0x1000;
+		. += 0x2000;
 		__svc_stack_top = .;
 		
 
 		__k_heap_start = .;
-		. += 0x1000;
+		. += 0x2000;
 		__k_heap_end = .;
 
 	. = 0x10140000;

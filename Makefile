@@ -7,10 +7,10 @@ CC=arm-none-linux-gnueabi-gcc
 AS=arm-none-linux-gnueabi-as
 LD=arm-none-linux-gnueabi-ld
 OBJCOPY=arm-none-linux-gnueabi-objcopy
-RAMDISK=./ramdiskMaker.o $(KLAUSNAME).bin
+RAMDISK=./ramdiskMaker.o $(1)
 
 CCFLAGS=-c -mcpu=arm926ej-s -g -Iinclude/devices -Iinclude/system -I.
-CCLINKFLAGS=-efunc -nostdlib -nodefaultlibs
+CCLINKFLAGS=-efunc -nostdlib -nodefaultlibs -nostartfiles
 ASFLAGS=-mcpu=arm926ej-s -g
 LDFLAGS=-T
 OBJCOPYFLAGS=-O binary -S
@@ -23,16 +23,23 @@ all: $(TARGET)
 
 rebuild: clean all KLAUS
 
-###### Klaus stuff #####
-KLAUSFILES=$(KLAUSNAME).o $(KLAUSNAME).bin
+###### Klaus stiuff #####
+KLAUSOBJS=klaus.o gunther.o
+KLAUSBIN=klaus.bin gunther.bin
+KLAUSFILES=$(KLAUSBIN)
 
 KLAUS:$(KLAUSFILES)
-	$(call RAMDISK)
+	$(call RAMDISK, $(KLAUSBIN))
 
-$(KLAUSNAME).o: $(KLAUSNAME).c 
-	$(CC) $(CCFLAGS) $(CCLINKFLAGS) $(KLAUSNAME).c -o $(KLAUSNAME).o	
-$(KLAUSNAME).bin: $(KLAUSNAME).o
-	$(OBJCOPY) $(OBJCOPYFLAGS) $(KLAUSNAME).o $(KLAUSNAME).bin
+klaus.o: klaus.c 
+	$(CC) $(CCFLAGS) $(CCLINKFLAGS) klaus.c -o klaus.o	
+klaus.bin: klaus.o
+	$(OBJCOPY) $(OBJCOPYFLAGS) klaus.o klaus.bin
+
+gunther.o: gunther.c
+	$(CC) $(CCFLAGS) $(CCLINKFLAGS) gunther.c -o gunther.o
+gunther.bin: gunther.o
+	$(OBJCOPY) $(OBJCOPYFLAGS) gunther.o gunther.bin
 ###### Klaus Stuff #####
 
 clean:
@@ -42,7 +49,7 @@ clean:
 	$(call RM, core/devices/*.o )
 	$(call RM, core/scheduler/*.o )
 OBJS=ramdisk.o startup/arm_irq.o  \
-	core/mops_create_thread.o \
+	core/mops_continue.o \
 	core/devices/p_vic.o \
 	core/devices/vic.o core/devices/timer.o core/devices/p_timer.o\
 	core/devices/uart.o core/devices/p_uart.o \

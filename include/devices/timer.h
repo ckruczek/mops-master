@@ -13,6 +13,7 @@ timer.h - This is the timer header file. It contains function
 
 #include <stdint.h>
 #include "uart.h"
+#include "scheduler.h"
 
 #define TIMER_INTENABLE	(1<<4)
 #define TIMER_CONTROL_MASK 0xEF

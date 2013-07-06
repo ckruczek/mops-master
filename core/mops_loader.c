@@ -1,5 +1,5 @@
 #include "mops_loader.h"
-#include "mops_create_thread.h"
+#include "thread.h"
 
 void mops_load_ramdisk()
 {
@@ -9,17 +9,29 @@ void mops_load_ramdisk()
 	uint32_t* start= &__k_heap_start;
 	uint32_t* dst = &__k_heap_start;
 	int i = 0;
-	for(; i < length; i++)
-		*dst++ = ramdisk[i];
+	int j = 0;
+	int imageLength = sizeof(imageDescriptor) / sizeof(imageDescriptor[0]);
 
-	Thread t;
-	t.data.start = start;
-	t.data.end = dst;
-	t.data.sp = dst - 12;
-	mops_create_thread(&t);
+	for(; i < imageLength; i++)
+	{
+		int bufferLength =  imageDescriptor[i];
+		bufferLength += j;
+		// copy the essential assembler codes
+		for(; j <  bufferLength; j++)
+		{
+			*dst++ = ramdisk[j];
+		}
+		int stackSize = ramdisk[j];
+		j++;
+		int k = 0;
+		// copy the essential stack size, just zeros
+		for(; k < stackSize; k++)
+		{
+			*dst++ = 0x0;
+		}
+		mops_create_thread_layout(start,dst);
+		start = (dst + 0x04);
+		dst = start;
+	}
 }
 
-void mops_create_thread(uint32_t *threadAddr)
-{
-	MOPS_create_thread(threadAddr);
-}

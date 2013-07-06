@@ -15,7 +15,8 @@ timer.c - This is the Timer module. It contains the
 void isr_Timer(void)
 {
 	timer_clear_interrupt();
-	uart_print("tick\n");
+//	uart_print("tick\n");
+	mops_schedule();
 }
 
 /***************************************************************
@@ -39,7 +40,7 @@ init_timer - This function initialises the timer whos base
 void init_timer(void)
 {
     dual_timer.Timer1.TimerIntClr = 1;
-    dual_timer.Timer1.TimerLoad = 10000;
+    dual_timer.Timer1.TimerLoad = 1000000;
     dual_timer.Timer1.TimerControl |=
         (TIMER_CONTROL_MODE_PERIODIC |
          TIMER_CONTROL_INT_ENABLED |

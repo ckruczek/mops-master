@@ -2,13 +2,11 @@
 #define SCHEDULER_H
 
 #include <stdint.h>
+#include "thread.h"
 
+void mops_schedule();
+void mops_continue(uint32_t *threadAddr);
 
-typedef struct sched_task
-{
-	uint32_t id;
-	uint32_t prio;
-
-} sched_task;
+static int currIndex = 0;
 
 #endif

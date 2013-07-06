@@ -8,34 +8,20 @@ typedef uint32_t FINAL_BUFFER_TYPE;
 
 const char* BUFFER_NAME = "uint32_t";
 
-void writeRamDisk(FINAL_BUFFER_TYPE *buffer, unsigned long bufferSize, int stackSize)
+void writeRamDisk(FILE *ramdisk,FINAL_BUFFER_TYPE *buffer, unsigned long bufferSize, int stackSize)
 {
-	FILE *ramDisk;
-	ramDisk = fopen("ramdisk.h", "w+");
-
-	int bufferPlusStack = bufferSize + stackSize;
-	fprintf(ramDisk, "#include <stdint.h>\n");
-	fprintf(ramDisk, "extern const %s  ramdisk[%ld];",BUFFER_NAME,bufferPlusStack);
-	fclose(ramDisk);
-
-	ramDisk = fopen("ramdisk.c", "w+");
-	fprintf(ramDisk,"#include \"ramdisk.h\" \n");
-	fprintf(ramDisk,"const %s ramdisk[%ld] = {",BUFFER_NAME,bufferPlusStack);
-	
-	for(int i =0; i < bufferPlusStack; i++)
+	for(int i =0; i < bufferSize+1; i++)
 	{
-		if(i < bufferSize)
-			fprintf(ramDisk,"%#x",buffer[i]);
+		if(i != bufferSize)
+		{
+			fprintf(ramdisk,"%#x",buffer[i]);
+			fprintf(ramdisk,"%s",",");
+		}
 		else
-			fprintf(ramDisk, "%#x", (FINAL_BUFFER_TYPE)0x00);
-
-		if(i != bufferPlusStack - 1)
-			fprintf(ramDisk,"%s",",");
+			fprintf(ramdisk,"%i",stackSize);
 		if(i % 16 == 0)
-			fprintf(ramDisk,"%s","\n");
+			fprintf(ramdisk,"%s","\n");
 	}
-	fprintf(ramDisk,"%s", "};");
-	fclose(ramDisk);
 }
 
 void convertToUint32(BUFFER_TYPE *buffer, size_t length, FINAL_BUFFER_TYPE *newBuffer)
@@ -46,7 +32,7 @@ void convertToUint32(BUFFER_TYPE *buffer, size_t length, FINAL_BUFFER_TYPE *newB
 	}
 }
 
-void readFile(const char* name)
+void readFile(FILE *ramdisk,const char* name)
 {
 	FILE *file;
 	BUFFER_TYPE *buffer;
@@ -65,19 +51,20 @@ void readFile(const char* name)
 	buffer = (BUFFER_TYPE*)malloc(fileLen * bufferTypeSize);
 	if(buffer)
 	{
-		printf("Size of buffer type %i\n", sizeof(BUFFER_TYPE));
 		size_t result = fread(buffer,sizeof(BUFFER_TYPE),fileLen ,file);
-		size_t bufferLength = (fileLen * sizeof(FINAL_BUFFER_TYPE)) / sizeof(FINAL_BUFFER_TYPE);
+		size_t bufferLength = (fileLen * sizeof(FINAL_BUFFER_TYPE)) / sizeof(FINAL_BUFFER_TYPE) / 2;
 		FINAL_BUFFER_TYPE *finalBuffer = (FINAL_BUFFER_TYPE*)malloc(bufferLength);
 		convertToUint32(buffer,fileLen, finalBuffer);
 		fclose(file);
+
 		if(result != fileLen)
 		{
 			printf("Error reading file\n");
 			free(buffer);
+			free(finalBuffer);
 			return;
 		}
-		writeRamDisk(finalBuffer, bufferLength , 512);
+		writeRamDisk(ramdisk,finalBuffer, bufferLength , 512);
 		printf("Finished writing ramdisk.h\n");
 		free(buffer);
 
@@ -85,14 +72,59 @@ void readFile(const char* name)
 
 }
 
+void writeImageDescriptor(char* fileNames[], int length)
+{	
+	FILE *ramdisk = fopen("ramdisk.c", "w+");
+	fprintf(ramdisk, "#include \"ramdisk.h\"\n");
+	fprintf(ramdisk, "const %s imageDescriptor[%i] = {",BUFFER_NAME,length-1);
+	int sum = 0;
+	for(int i = 1; i < length; i++)
+	{
+		FILE *binFile = fopen(fileNames[i], "rb");
+		fseek(binFile,0, SEEK_END);
+		size_t filelength = ftell(binFile);
+		filelength /= sizeof(FINAL_BUFFER_TYPE);
+		fprintf(ramdisk,"%i", filelength);
+		if(i != length - 1)
+			fprintf(ramdisk,",");
 
+		fclose(binFile);
+		sum += filelength+1;
+	}
+	fprintf(ramdisk,"};\n");
+	fclose(ramdisk);
+
+	ramdisk = fopen("ramdisk.h", "a+");
+	fprintf(ramdisk,"extern const %s ramdisk[%i];\n",BUFFER_NAME, sum);
+	fclose(ramdisk);
+	ramdisk = fopen("ramdisk.c", "a+");
+	fprintf(ramdisk, "const %s ramdisk[%i] = {", BUFFER_NAME, sum);
+	fclose(ramdisk);
+}
 
 int main(int argc, char* argv[])
 {
 	
 		if(argc > 1)
 		{
-			readFile(argv[1]);
+			FILE* ramdisk = fopen("ramdisk.h", "w+");
+			fprintf(ramdisk,"#include<stdint.h>\n");
+			fprintf(ramdisk, "extern const %s imageDescriptor[%i];\n",BUFFER_NAME, argc-1);
+			fclose(ramdisk);
+			
+			writeImageDescriptor(argv,argc);
+			
+			ramdisk = fopen("ramdisk.c", "a+");
+
+			for(int i = 1; i < argc; i ++)
+			{
+				readFile(ramdisk,argv[i]);
+				if(i < argc - 1)
+					fprintf(ramdisk,",");
+			}
+			fprintf(ramdisk,"};\n");
+			fclose(ramdisk);
+
 		}
 		else
 		{
