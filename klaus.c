@@ -1,9 +1,12 @@
 //#include "syscalls.h"
 
-void func()
+void klaus()
 {	
-	  asm("mov r0, #33");
-	  asm("swi 0x0");
+//	for(;;)
+	{	 
+		asm("mov r0, #33");
+		asm("swi 0x0");
+	}
 }
 
 

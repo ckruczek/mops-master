@@ -15,8 +15,8 @@ timer.c - This is the Timer module. It contains the
 void isr_Timer(void)
 {
 	timer_clear_interrupt();
-//	uart_print("tick\n");
-	mops_schedule();
+	uart_print("tick\n");
+//	mops_schedule();
 }
 
 /***************************************************************

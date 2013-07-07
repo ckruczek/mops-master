@@ -1,6 +1,7 @@
 ENTRY(_start) 
 SECTIONS
 {
+	. =0x000000;
 	.ramvect  :
  	{
  		__ram_start = .;

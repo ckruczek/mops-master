@@ -37,7 +37,7 @@ void init_vic()
 	primary_vic.VectAddrs[1] =	(uint32_t) &isr_Timer;
 	primary_vic.VectCntl[1]	|=	(uint32_t)(PVICSOURCE_TIMER | VIC_VECTOR_ENABLE);
 
-	vic_enable_as_irq(TIMER_INTENABLE);
+	vic_enable_as_fiq(TIMER_INTENABLE);
 	vic_enable_interrupt(TIMER_INTENABLE);
 
 	/** INIT UART0 AND ENABLE INTERRUPTS IN VIC ** */

@@ -29,7 +29,22 @@ ARM_int_disable:
 	orr r0,r0, #NO_IRQ
 	msr cpsr, r0
 	ldmfd sp!, {r0,pc}
+	
 
+ARM_handle_interrupt:
+	stmfd sp!, {lr}
+	stmfd sp!,{r0,r1,lr}
+	ldr r0, =primary_vic
+	ldr r1, [r0, #0x30]
+	stmfd sp!, {r0-r2,lr}
+	mov lr, pc
+	bx r1
+	ldr r0,=vic_clear_vect_addr
+	mov lr, pc
+	bx r0
+	ldmfd sp!, {r0-r2,lr}
+	ldmfd sp!, {r0,r1,lr}
+	ldmfd sp!, {pc}
 	.global ARM_irq
 	.func	ARM_irq
 ARM_irq:
@@ -39,21 +54,8 @@ ARM_irq:
 	
 	msr cpsr_c, #(Mode_IRQ | NO_IRQ)
 	sub lr, lr, #4
-	stmfd sp!, {lr}
-	// save the current 
-	stmfd sp!, {r0,r1,lr}
-	// get the primary vic base address
-	ldr r0, =primary_vic
-	// on offset 0x30 is the vector address for the current isr
-	ldr r1, [r0,#0x30]
-	stmfd sp!, {r0-r2,lr}
-	mov lr, pc
-	bx r1
-	ldr r0, =vic_clear_vect_addr
-	mov lr, pc
-	bx r0
-	ldmfd sp!,{r0-r2,lr}
-	ldmfd sp!, {r0,r1,lr}
+	stmfd sp!,{lr}
+	bl ARM_handle_interrupt
 	msr spsr_cxsf, r0
 	ldmfd sp!, {pc}^
 	.size ARM_irq, . - ARM_irq
@@ -86,47 +88,17 @@ ARM_swi:
     .global ARM_fiq
     .func   ARM_fiq
 ARM_fiq:
-/* FIQ entry {{{ */
-    MOV     r13,r0              /* save r0 in r13_FIQ */
-    SUB     r0,lr,#4            /* put return address in r0_SYS */
-    MOV     lr,r1               /* save r1 in r14_FIQ (lr) */
-    MRS     r1,spsr             /* put the SPSR in r1_SYS */
 
-    MSR     cpsr_c,#(SYS_MODE | NO_INT) /* SYSTEM mode, IRQ/FIQ disabled */
-    STMFD   sp!,{r0,r1}         /* save SPSR and PC on SYS stack */
-    STMFD   sp!,{r2-r3,r12,lr}  /* save APCS-clobbered regs on SYS stack */
-    MOV     r0,sp               /* make the sp_SYS visible to FIQ mode */
-    SUB     sp,sp,#(2*4)        /* make room for stacking (r0_SYS, SPSR) */
+	mrs r0, spsr
+	
+	msr cpsr_c, #(FIQ_MODE | NO_INT)
+	sub lr, lr, #4
+	stmfd sp!, {lr}
+	bl ARM_handle_interrupt
+	msr spsr_cxsf, r0
+	ldmfd sp!, {pc}^
 
-    MSR     cpsr_c,#(FIQ_MODE | NO_INT) /* FIQ mode, IRQ/FIQ disabled */
-    STMFD   r0!,{r13,r14}       /* finish saving the context (r0_SYS,r1_SYS)*/
-
-    MSR     cpsr_c,#(SYS_MODE | NO_INT) /* SYSTEM mode, IRQ/FIQ disabled */
-/* FIQ entry }}} */
-
-    /* NOTE: NOTE: BSP_fiq must NEVER enable IRQ/FIQ interrrupts!
-    */
-    LDR     r12,=arm_fiq
-    MOV     lr,pc               /* store the return address */
-    BX      r12                 /* call the C FIQ-handler (ARM/THUMB)
-
-
-/* FIQ exit {{{ */              /* both IRQ/FIQ disabled (see NOTE above) */
-    MOV     r0,sp               /* make sp_SYS visible to FIQ mode */
-    ADD     sp,sp,#(8*4)        /* fake unstacking 8 registers from sp_SYS */
-
-    MSR     cpsr_c,#(FIQ_MODE | NO_INT) /* FIQ mode, IRQ/FIQ disabled */
-    MOV     sp,r0               /* copy sp_SYS to sp_FIQ */
-    LDR     r0,[sp,#(7*4)]      /* load the saved SPSR from the stack */
-    MSR     spsr_cxsf,r0        /* copy it into spsr_FIQ */
-
-    LDMFD   sp,{r0-r3,r12,lr}^  /* unstack all saved USER/SYSTEM registers */
-    NOP                         /* can't access banked reg immediately */
-    LDR     lr,[sp,#(6*4)]      /* load return address from the SYS stack */
-    MOVS    pc,lr               /* return restoring CPSR from SPSR */
-/* FIQ exit }}} */
-
-    .size   ARM_fiq, . - ARM_fiq
+	.size   ARM_fiq, . - ARM_fiq
     .endfunc
 
 

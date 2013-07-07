@@ -10,7 +10,7 @@ const char* BUFFER_NAME = "uint32_t";
 
 void writeRamDisk(FILE *ramdisk,FINAL_BUFFER_TYPE *buffer, unsigned long bufferSize, int stackSize)
 {
-	for(int i =0; i < bufferSize+1; i++)
+	for(int i =0; i < bufferSize+1 ; i++)
 	{
 		if(i != bufferSize)
 		{
@@ -47,15 +47,14 @@ void readFile(FILE *ramdisk,const char* name)
 	fileLen /= bufferTypeSize;
 	rewind(file);
 
-	printf("Read %ld bytes\n",fileLen);
+	printf("Read %s with %ld bytes\n",name,fileLen);
 	buffer = (BUFFER_TYPE*)malloc(fileLen * bufferTypeSize);
 	if(buffer)
 	{
 		size_t result = fread(buffer,sizeof(BUFFER_TYPE),fileLen ,file);
-		size_t bufferLength = (fileLen * sizeof(FINAL_BUFFER_TYPE)) / sizeof(FINAL_BUFFER_TYPE) / 2;
-		FINAL_BUFFER_TYPE *finalBuffer = (FINAL_BUFFER_TYPE*)malloc(bufferLength);
+		size_t bufferLength = (fileLen * sizeof(FINAL_BUFFER_TYPE))  / 2;
+		FINAL_BUFFER_TYPE *finalBuffer = (FINAL_BUFFER_TYPE*)malloc(bufferLength );
 		convertToUint32(buffer,fileLen, finalBuffer);
-		fclose(file);
 
 		if(result != fileLen)
 		{
@@ -64,11 +63,14 @@ void readFile(FILE *ramdisk,const char* name)
 			free(finalBuffer);
 			return;
 		}
-		writeRamDisk(ramdisk,finalBuffer, bufferLength , 512);
-		printf("Finished writing ramdisk.h\n");
+		writeRamDisk(ramdisk,finalBuffer, bufferLength / sizeof(FINAL_BUFFER_TYPE), 512);
+		free(finalBuffer);
+		printf("Finished %s\n\n",name);
 		free(buffer);
 
 	}
+
+	fclose(file);
 
 }
 

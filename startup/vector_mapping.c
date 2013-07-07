@@ -1,28 +1,5 @@
-/*****************************************************************************
-* Product: Low-level initialization for AT91SAM7S-EK
-* Date of the Last Update:  May 16, 2007
-*
-*                    Q u a n t u m     L e a P s
-*                    ---------------------------
-*                    innovating embedded systems
-*
-* Copyright (C) 2002-2007 Quantum Leaps, LLC. All rights reserved.
-*
-* Contact information:
-* Quantum Leaps Web site:  http://www.quantum-leaps.com
-* e-mail:                  info@quantum-leaps.com
-*****************************************************************************/
 #include <stdint.h>
 #include "uart.h"
-/*..........................................................................*/
-/* low_level_init() is invoked by the startup sequence after initializing
-* the C stack, but before initializing the segments in RAM.
-*
-* low_level_init() is invoked in the ARM state. The function gives the
-* application a chance to perform early initializations of the hardware.
-* This function cannot rely on initialization of any static variables,
-* because these have not yet been initialized in RAM.
-*/
 
 
 void map_vectors(void (*reset_addr)(), void (*return_addr)()) 

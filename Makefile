@@ -10,7 +10,7 @@ OBJCOPY=arm-none-linux-gnueabi-objcopy
 RAMDISK=./ramdiskMaker.o $(1)
 
 CCFLAGS=-c -mcpu=arm926ej-s -g -Iinclude/devices -Iinclude/system -I.
-CCLINKFLAGS=-efunc -nostdlib -nodefaultlibs -nostartfiles
+CCLINKFLAGS= -nostdlib -nodefaultlibs -nostartfiles
 ASFLAGS=-mcpu=arm926ej-s -g
 LDFLAGS=-T
 OBJCOPYFLAGS=-O binary -S

@@ -24,14 +24,6 @@
 	.equ	I_Bit,     0x80 // when I bit is set, IRQ is disabled
 	.equ	F_Bit,     0x40 // when F bit is set, FIQ is disabled
 
-	.equ	Len_FIQ_Stack,	512
-	.equ	Len_IRQ_Stack,	512
-	.equ 	Len_SYS_Stack,   512
-
-	.equ 	Offset_FIQ_Stack,	0
-	.equ	Offset_IRQ_Stack,	Offset_FIQ_Stack + Len_FIQ_Stack
-	.equ	Offset_SYS_Stack,	Offset_IRQ_Stack + Len_IRQ_Stack
-	.equ	Offset_SVC_Stack,	Offset_SYS_Stack + Len_SYS_Stack
 
 initstacks:
 // stack_base could be defined above, or located in a scatter file. CPSR currently in SVC mode.
