@@ -6,23 +6,17 @@ void mops_schedule()
 	if(currIndex > MAX_THREADS)
 		currIndex = 0;
 	int i = 0;
-	int setRuning = 0;
 	Thread nextRunner;
 	for(;i < MAX_THREADS; i++)
 	{
 		Thread t = threadTable[i];
-		if(t.state != UNDEFINED && setRuning == 0)
+		if(t.state != UNDEFINED)
 		{
 			switch(t.state)
 			{
 				case WAITING:
-					t.state = RUNING;
-					nextRunner = t;
-					break;
 				case NEW:
 					t.state = RUNING;
-					nextRunner = t;
-					setRuning = 1;
 					break;
 				case RUNING:
 					t.state = WAITING;
@@ -31,10 +25,11 @@ void mops_schedule()
 			threadTable[i] = t;
 		}
 	}
-	mops_continue((uint32_t*)&nextRunner);
+	currIndex++;
+	asm("mov r0,#42");
 }
 
-void mops_continue(uint32_t *threadAddr)
+void mops_resume(int threadTableIndex)
 {
-	MOPS_continue(threadAddr);
+	MOPS_resume((uint32_t*)&threadTable[threadTableIndex]);
 }

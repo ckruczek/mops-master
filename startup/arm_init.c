@@ -13,11 +13,6 @@ void arm_init()
 	uart_print("== Finished mapping exception handler\n");
 }
 
-void arm_fiq()
-{
-	uint32_t pic_status = primary_vic.VectAddr;
-}
-
 void arm_abort()
 {
 	for(;;){}

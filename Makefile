@@ -12,24 +12,30 @@ RAMDISK=./ramdiskMaker.o $(1)
 CCFLAGS=-c -mcpu=arm926ej-s -g -Iinclude/devices -Iinclude/system -I.
 CCLINKFLAGS= -nostdlib -nodefaultlibs -nostartfiles
 ASFLAGS=-mcpu=arm926ej-s -g
-LDFLAGS=-T
+LDFLAGS=-T 
 OBJCOPYFLAGS=-O binary -S
-
+ARMPATH=/usr/arm-none-linux-gnueabi/libc/thumb2/usr/lib/
 RM=rm -f $(1)
 
 all: $(TARGET)
 	$(OBJCOPY) $(OBJCOPYFLAGS) $(TARGET) $(BIN)
 
 
-rebuild: clean all KLAUS
+rebuild: clean all proc
 
-###### Klaus stiuff #####
-KLAUSOBJS=klaus.o gunther.o
-KLAUSBIN=klaus.bin gunther.bin
-KLAUSFILES=$(KLAUSBIN)
+###### Klaus stuff #####
 
-KLAUS:$(KLAUSFILES)
-	$(call RAMDISK, $(KLAUSBIN))
+procOBJS=klaus.o gunther.o scheduler.o
+procBIN=scheduler.bin klaus.bin gunther.bin
+procFILES=$(procBIN)
+
+proc:$(procFILES)
+	$(call RAMDISK, $(procBIN))
+
+scheduler.o: core/scheduler/scheduler.c $(HEADERS)
+	$(CC) -c -mcpu=arm926ej-s -Iinclude/system $(CCLINKFLAGS) core/scheduler/scheduler.c -o scheduler.o
+scheduler.bin: scheduler.o
+	$(OBJCOPY) $(OBJCOPYFLAGS) scheduler.o scheduler.bin
 
 klaus.o: klaus.c 
 	$(CC) $(CCFLAGS) $(CCLINKFLAGS) klaus.c -o klaus.o	
@@ -40,6 +46,7 @@ gunther.o: gunther.c
 	$(CC) $(CCFLAGS) $(CCLINKFLAGS) gunther.c -o gunther.o
 gunther.bin: gunther.o
 	$(OBJCOPY) $(OBJCOPYFLAGS) gunther.o gunther.bin
+
 ###### Klaus Stuff #####
 
 clean:
@@ -49,7 +56,7 @@ clean:
 	$(call RM, core/devices/*.o )
 	$(call RM, core/scheduler/*.o )
 OBJS=ramdisk.o startup/arm_irq.o  \
-	core/mops_continue.o \
+	core/mops_resume.o \
 	core/devices/p_vic.o \
 	core/devices/vic.o core/devices/timer.o core/devices/p_timer.o\
 	core/devices/uart.o core/devices/p_uart.o \
@@ -65,7 +72,7 @@ HEADERS=include/devices/timer.h include/devices/uart.h \
 		ramdisk.h include/system/mops_loader.h
 
 $(TARGET): $(OBJS)
-	$(LD) $(LDFLAGS) $(LINKFILE) -o $(TARGET) $(OBJS) 
+	$(LD) -L $(ARMPATH) -lc  $(CCLINKFLAGS) $(LDFLAGS) $(LINKFILE) -o $(TARGET) $(OBJS) 
 
 ramdisk.o: ramdisk.c $(HEADERS)
 	$(CC) $(CCFLAGS) ramdisk.c -o ramdisk.o
@@ -102,5 +109,5 @@ startup/arm_irq.o: startup/arm_irq.s
 	$(AS) $(ASFLAGS) startup/arm_irq.s -o startup/arm_irq.o
 startup/initstacks.o: startup/initstacks.s
 	$(AS) $(ASFLAGS) startup/initstacks.s -o startup/initstacks.o
-core/mops_change_proc.o: core/mops_change_proc.s
-	$(AS) $(ASFLAGS) core/mops_change_proc.s -o core/mops_change_proc.o
+core/mops_resume.o: core/mops_resume.s
+	$(AS) $(ASFLAGS) core/mops_resume.s -o core/mops_resume.o

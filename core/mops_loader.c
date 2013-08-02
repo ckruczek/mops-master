@@ -32,6 +32,9 @@ void mops_load_ramdisk()
 		mops_create_thread_layout(start,dst);
 		start = (dst + 0x04);
 		dst = start;
+
 	}
+
+	threadTable[0].canBeScheduled = 0;
 }
 

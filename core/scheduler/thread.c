@@ -1,7 +1,4 @@
 #include "thread.h"
-
-
-
 int mops_create_thread_layout(uint32_t* startAddr, uint32_t* endAddr)
 {
 	int i = 0;
@@ -17,7 +14,10 @@ int mops_create_thread_layout(uint32_t* startAddr, uint32_t* endAddr)
 		if(threadTable[i].state != UNDEFINED)
 			threadsFullCount++;
 		else
+		{
 			emptyThreadTableIndex = i;
+			break;
+		}
 	}
 
 	if(threadsFullCount == MAX_THREADS)
@@ -29,6 +29,9 @@ int mops_create_thread_layout(uint32_t* startAddr, uint32_t* endAddr)
 	t.data.pc = startAddr;
 	t.id = ++maxId;
 	t.state = NEW;
+	t.canBeScheduled = 1;
+	t.all_register[15] = startAddr;
+	t.all_register[13] = t.data.sp;
 	threadTable[emptyThreadTableIndex] = t;
 	return t.id;
 

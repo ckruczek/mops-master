@@ -1,12 +1,3 @@
-/***************************************************************
-        Copyright ARM Ltd 2002-6. All rights reserved.
-****************************************************************
-    Versatile test program for nested-interrupt handler code
-****************************************************************
-vic.h - This is the vic header file. It contains code 
-        corresponding to the primary vic (see vic.c).
-***************************************************************/
-
 #ifndef VERSATILE_VIC_H
 #define VERSATILE_VIC_H
 

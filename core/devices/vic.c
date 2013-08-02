@@ -28,10 +28,6 @@ void vic_clear_vect_addr()
 
 void init_vic()
 {
-	/*
-	// register secondary vic
-	primary_vic.VectAddrs[0] = (uint32_t)&irq_secondary_vic;
-	primary_vic.VectCntl[0] |= (uint32_t)(PVICSOURCE_SVIC | VIC_VECTOR_ENABLE); */
 	
 	/** INIT TIMER AND ENABLE INTERRUPT IN VIC ** */
 	primary_vic.VectAddrs[1] =	(uint32_t) &isr_Timer;

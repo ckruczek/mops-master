@@ -1,13 +1,3 @@
-/*;***************************************************************
-; Copyright ARM Ltd 2002-6. All rights reserved.
-;***************************************************************
-; Versatile test program for nested-interrupt handler code
-;***************************************************************
-; initstacks.s - This is the initstacks module. It deals with 
-;                stack initialisation.
-;***************************************************************
-
-; Standard definitions of mode bits and interrupt (I & F) flags in PSRs*/
 	.text
 	.code 32
 	.global initstacks

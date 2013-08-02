@@ -52,7 +52,7 @@ ARM_irq:
 	// save old status
 	mrs r0, spsr
 	
-	msr cpsr_c, #(Mode_IRQ | NO_IRQ)
+	//msr cpsr_c, #(Mode_IRQ | NO_IRQ)
 	sub lr, lr, #4
 	stmfd sp!,{lr}
 	bl ARM_handle_interrupt

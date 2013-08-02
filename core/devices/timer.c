@@ -1,11 +1,11 @@
 /***************************************************************
-        Copyright ARM Ltd 2002-6. All rights reserved.
+Copyright ARM Ltd 2002-6. All rights reserved.
 ****************************************************************
-    Versatile test program for nested-interrupt handler code
+Versatile test program for nested-interrupt handler code
 ****************************************************************
 timer.c - This is the Timer module. It contains the 
-          initialisation prodecure for the Timer, an interrupt 
-          clear function, and an interrupt handler.
+  initialisation prodecure for the Timer, an interrupt 
+  clear function, and an interrupt handler.
 ***************************************************************/
 
 #include "vic.h"
@@ -15,18 +15,17 @@ timer.c - This is the Timer module. It contains the
 void isr_Timer(void)
 {
 	timer_clear_interrupt();
-	uart_print("tick\n");
-//	mops_schedule();
+	mops_resume(0);
 }
 
 /***************************************************************
 timer_clear_interrupt - This function writes to the timer 
-                        interrupt clear register in the timer.
+				interrupt clear register in the timer.
 ***************************************************************/
 
 void timer_clear_interrupt(void)
 {
-    dual_timer.Timer1.TimerIntClr = 0x0;
+dual_timer.Timer1.TimerIntClr = 0x0;
 	vic_clear_interrupt(TIMER_INTENABLE);
 	vic_enable_interrupt(TIMER_INTENABLE);
 }
