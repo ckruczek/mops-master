@@ -35,6 +35,5 @@ void mops_load_ramdisk()
 
 	}
 
-	threadTable[0].canBeScheduled = 0;
 }
 

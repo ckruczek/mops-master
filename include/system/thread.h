@@ -32,10 +32,8 @@ typedef struct Thread
 	uint32_t all_register[16];
 } Thread;
 
-Thread threadTable[MAX_THREADS];
 int mops_create_thread_layout(uint32_t*, uint32_t*);
 
-extern void MOPS_resume(uint32_t* threadAddress);
 
 
 #endif

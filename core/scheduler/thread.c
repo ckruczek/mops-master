@@ -1,4 +1,5 @@
 #include "thread.h"
+#include "scheduler.h"
 int mops_create_thread_layout(uint32_t* startAddr, uint32_t* endAddr)
 {
 	int i = 0;
@@ -22,17 +23,12 @@ int mops_create_thread_layout(uint32_t* startAddr, uint32_t* endAddr)
 
 	if(threadsFullCount == MAX_THREADS)
 		return -1;
-	Thread t = threadTable[emptyThreadTableIndex];
-	t.data.start = startAddr;
-	t.data.end = endAddr;
-	t.data.sp = endAddr - 12;
-	t.data.pc = startAddr;
-	t.id = ++maxId;
-	t.state = NEW;
-	t.canBeScheduled = 1;
-	t.all_register[15] = startAddr;
-	t.all_register[13] = t.data.sp;
-	threadTable[emptyThreadTableIndex] = t;
-	return t.id;
+	 threadTable[emptyThreadTableIndex].data.start = startAddr;
+	 threadTable[emptyThreadTableIndex].id = ++maxId;
+	 threadTable[emptyThreadTableIndex].state = NEW;
+	 threadTable[emptyThreadTableIndex].canBeScheduled = 1;
+	 threadTable[emptyThreadTableIndex].all_register[15] = startAddr;
+	 threadTable[emptyThreadTableIndex].all_register[13] = endAddr - 12;
+	return threadTable[emptyThreadTableIndex].id;
 
 }

@@ -34,17 +34,20 @@ ARM_int_disable:
 ARM_handle_interrupt:
 	stmfd sp!, {lr}
 	stmfd sp!,{r0,r1,lr}
-	ldr r0, =primary_vic
-	ldr r1, [r0, #0x30]
 	stmfd sp!, {r0-r2,lr}
-	mov lr, pc
-	bx r1
 	ldr r0,=vic_clear_vect_addr
 	mov lr, pc
 	bx r0
+	ldr r0, =primary_vic
+	ldr r1, [r0, #0x30]
+	mov lr, pc
+	bx r1
+
 	ldmfd sp!, {r0-r2,lr}
 	ldmfd sp!, {r0,r1,lr}
 	ldmfd sp!, {pc}
+
+		
 	.global ARM_irq
 	.func	ARM_irq
 ARM_irq:
@@ -52,7 +55,6 @@ ARM_irq:
 	// save old status
 	mrs r0, spsr
 	
-	//msr cpsr_c, #(Mode_IRQ | NO_IRQ)
 	sub lr, lr, #4
 	stmfd sp!,{lr}
 	bl ARM_handle_interrupt
@@ -69,6 +71,7 @@ ARM_irq:
 ARM_swi:
 	sub sp,sp,#4
 	stmfd sp!, {r0-r12,lr}
+	msr cpsr_c, #NO_IRQ
 	mrs r2, spsr
 	str r2, [sp, #14*4]
 	mov r1, sp
@@ -91,7 +94,7 @@ ARM_fiq:
 
 	mrs r0, spsr
 	
-	msr cpsr_c, #(FIQ_MODE | NO_INT)
+	msr cpsr_c, #(FIQ_MODE | NO_FIQ)
 	sub lr, lr, #4
 	stmfd sp!, {lr}
 	bl ARM_handle_interrupt

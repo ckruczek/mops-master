@@ -24,7 +24,6 @@ SECTIONS
 		*(.text.fastcode)
 		. = ALIGN(4);
  	}	 
-
  	.text : { *(.text) } 
  	.data : { *(.data) }
  	.bss : { *(.bss COMMON) }
@@ -48,7 +47,8 @@ SECTIONS
 		__k_heap_start = .;
 		. += 0x2000;
 		__k_heap_end = .;
-
+	
+	threadTable = ABSOLUTE(.);
 	. = 0x10140000;
 	primary_vic =ABSOLUTE(.);
 	. = 0x10003000;

@@ -7,6 +7,6 @@
 void mops_schedule();
 void mops_resume(int threadTableIndex);
 
-static int currIndex = 0;
-static int lastIndex = 0;
+extern Thread threadTable[MAX_THREADS];
+extern void MOPS_resume(uint32_t* threadAddress);
 #endif

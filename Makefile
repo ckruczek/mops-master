@@ -9,12 +9,12 @@ LD=arm-none-linux-gnueabi-ld
 OBJCOPY=arm-none-linux-gnueabi-objcopy
 RAMDISK=./ramdiskMaker.o $(1)
 
-CCFLAGS=-c -mcpu=arm926ej-s -g -Iinclude/devices -Iinclude/system -I.
+CCFLAGS= -O0 -c -mcpu=arm926ej-s -g -Iinclude/devices -Iinclude/system -I.
 CCLINKFLAGS= -nostdlib -nodefaultlibs -nostartfiles
 ASFLAGS=-mcpu=arm926ej-s -g
 LDFLAGS=-T 
-OBJCOPYFLAGS=-O binary -S
-ARMPATH=/usr/arm-none-linux-gnueabi/libc/thumb2/usr/lib/
+OBJCOPYFLAGS=-O binary 
+ARMPATH=/usr/arm-none-linux-gnueabi/libc
 RM=rm -f $(1)
 
 all: $(TARGET)
@@ -34,8 +34,9 @@ proc:$(procFILES)
 
 scheduler.o: core/scheduler/scheduler.c $(HEADERS)
 	$(CC) -c -mcpu=arm926ej-s -Iinclude/system $(CCLINKFLAGS) core/scheduler/scheduler.c -o scheduler.o
+	$(LD) $(LDFLAGS) link_schedule.ld scheduler.o core/mops_resume.o -o scheduler_test.o
 scheduler.bin: scheduler.o
-	$(OBJCOPY) $(OBJCOPYFLAGS) scheduler.o scheduler.bin
+	$(OBJCOPY) $(OBJCOPYFLAGS) scheduler_test.o scheduler.bin
 
 klaus.o: klaus.c 
 	$(CC) $(CCFLAGS) $(CCLINKFLAGS) klaus.c -o klaus.o	
@@ -72,7 +73,7 @@ HEADERS=include/devices/timer.h include/devices/uart.h \
 		ramdisk.h include/system/mops_loader.h
 
 $(TARGET): $(OBJS)
-	$(LD) -L $(ARMPATH) -lc  $(CCLINKFLAGS) $(LDFLAGS) $(LINKFILE) -o $(TARGET) $(OBJS) 
+	$(LD)  $(LDFLAGS) $(LINKFILE) -o $(TARGET) $(OBJS) 
 
 ramdisk.o: ramdisk.c $(HEADERS)
 	$(CC) $(CCFLAGS) ramdisk.c -o ramdisk.o
