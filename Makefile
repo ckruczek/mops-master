@@ -31,12 +31,15 @@ procFILES=$(procBIN)
 
 proc:$(procFILES)
 	$(call RAMDISK, $(procBIN))
-
-scheduler.o: core/scheduler/scheduler.c $(HEADERS)
-	$(CC) -c -mcpu=arm926ej-s -Iinclude/system $(CCLINKFLAGS) core/scheduler/scheduler.c -o scheduler.o
-	$(LD) $(LDFLAGS) link_schedule.ld scheduler.o core/mops_resume.o -o scheduler_test.o
+scheduler.o: core/mops_scheduler.s
+	$(AS) $(ASFLAGS) core/mops_scheduler.s -o scheduler.o
 scheduler.bin: scheduler.o
-	$(OBJCOPY) $(OBJCOPYFLAGS) scheduler_test.o scheduler.bin
+	$(OBJCOPY) $(OBJCOPYFLAGS) scheduler.o scheduler.bin
+#scheduler.o: core/scheduler/scheduler.c $(HEADERS)
+#	$(CC) -c -mcpu=arm926ej-s -Iinclude/system $(CCLINKFLAGS) core/scheduler/scheduler.c -o scheduler.o
+#	$(LD) $(LDFLAGS) link_schedule.ld scheduler.o core/mops_resume.o -o scheduler_test.o
+#scheduler.bin: scheduler.o
+#	$(OBJCOPY) $(OBJCOPYFLAGS) scheduler_test.o scheduler.bin
 
 klaus.o: klaus.c 
 	$(CC) $(CCFLAGS) $(CCLINKFLAGS) klaus.c -o klaus.o	
@@ -57,11 +60,10 @@ clean:
 	$(call RM, core/devices/*.o )
 	$(call RM, core/scheduler/*.o )
 OBJS=ramdisk.o startup/arm_irq.o  \
-	core/mops_resume.o \
+	core/mops_scheduler.o \
 	core/devices/p_vic.o \
 	core/devices/vic.o core/devices/timer.o core/devices/p_timer.o\
 	core/devices/uart.o core/devices/p_uart.o \
-	core/scheduler/scheduler.o \
 	startup/vector_mapping.o startup/arm_init.o main.o \
 	startup/startup.o startup/initstacks.o  core/scheduler/thread.o \
 	core/syscalls/syscalls.o core/mops_loader.o
@@ -95,8 +97,8 @@ core/devices/p_vic.o: core/devices/p_vic.c $(HEADERS)
 	$(CC) $(CCFLAGS) core/devices/p_vic.c -o core/devices/p_vic.o
 core/devices/p_timer.o: core/devices/p_timer.c $(HEADERS)
 	$(CC) $(CCFLAGS) core/devices/p_timer.c -o core/devices/p_timer.o
-core/scheduler/scheduler.o: core/scheduler/scheduler.c $(HEADERS)
-	$(CC) $(CCFLAGS) core/scheduler/scheduler.c -o core/scheduler/scheduler.o
+#core/scheduler/scheduler.o: core/scheduler/scheduler.c $(HEADERS)
+#	$(CC) $(CCFLAGS) core/scheduler/scheduler.c -o core/scheduler/scheduler.o
 core/syscalls/syscalls.o: core/syscalls/syscalls.c $(HEADERS)
 	$(CC) $(CCFLAGS) core/syscalls/syscalls.c -o core/syscalls/syscalls.o
 core/scheduler/thread.o: core/scheduler/thread.c $(HEADERS)
@@ -110,5 +112,7 @@ startup/arm_irq.o: startup/arm_irq.s
 	$(AS) $(ASFLAGS) startup/arm_irq.s -o startup/arm_irq.o
 startup/initstacks.o: startup/initstacks.s
 	$(AS) $(ASFLAGS) startup/initstacks.s -o startup/initstacks.o
-core/mops_resume.o: core/mops_resume.s
-	$(AS) $(ASFLAGS) core/mops_resume.s -o core/mops_resume.o
+core/mops_scheduler.o: core/mops_scheduler.s
+	$(AS) $(ASFLAGS) core/mops_scheduler.s -o core/mops_scheduler.o
+#core/mops_resume.o: core/mops_resume.s
+#	$(AS) $(ASFLAGS) core/mops_resume.s -o core/mops_resume.o

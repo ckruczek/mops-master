@@ -48,7 +48,6 @@ SECTIONS
 		. += 0x2000;
 		__k_heap_end = .;
 	
-	threadTable = ABSOLUTE(.);
 	. = 0x10140000;
 	primary_vic =ABSOLUTE(.);
 	. = 0x10003000;
@@ -57,4 +56,8 @@ SECTIONS
 	dual_timer = ABSOLUTE(.);
 	. = 0x101F1000;
 	board_uart = ABSOLUTE(.);
+	. = 0x40;
+	pThreadTables = ABSOLUTE(.);
+	. = 0x50;
+	currThreadIndex = ABSOLUTE(.);
 }

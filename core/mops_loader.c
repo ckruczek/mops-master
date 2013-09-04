@@ -1,6 +1,9 @@
 #include "mops_loader.h"
 #include "thread.h"
+#include "scheduler.h"
 
+Thread* pThreadTables[MAX_THREADS];
+int currThreadIndex = 0;
 void mops_load_ramdisk()
 {
 	extern uint32_t __k_heap_start;
@@ -33,6 +36,15 @@ void mops_load_ramdisk()
 		start = (dst + 0x04);
 		dst = start;
 
+	}
+	i = 0;
+	volatile uint32_t* pThreadTablepointer = (volatile uint32_t*)&pThreadTables;
+	for(; i < MAX_THREADS; i++)
+	{	
+		pThreadTables[i] = &threadTable[i];
+	//	*pThreadTablepointer = (uint32_t*)&threadTable[i];
+	//	*pThreadTablepointer = i;
+	//	pThreadTablepointer++;
 	}
 
 }
