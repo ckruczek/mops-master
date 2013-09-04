@@ -33,6 +33,6 @@ void mops_trap_writeC_handler(uint32_t character)
 
 void mops_trap_schedule_handler(uint32_t* sp)
 {
-	mops_resume(*sp);
+//	mops_resume(*sp);
 //	MOPS_resume(address);
 }

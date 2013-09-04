@@ -9,8 +9,10 @@ void mops_schedule()
 	int index = 1;
 //	while(1)
 	{
-			if(index > MAX_THREADS)
-				index = 1;
+			if(++currIndex >= MAX_THREADS - 1)
+				currIndex = 0;
+
+			mops_resume(currIndex);
 //			int i = 0;
 /*			Thread nextRunner;
 			for(;i < MAX_THREADS; i++)
@@ -30,8 +32,8 @@ void mops_schedule()
 					}
 				}
 			}*/
-
-			asm("ldr r0, =threadTable");
+//			asm("mov r0,#44");
+//			asm("ldr r0, =threadTable");
 //			asm("add r1, r0, #0x1C");
 //			asm("mov r0, r1");
 /*			asm("mov r0, %0"

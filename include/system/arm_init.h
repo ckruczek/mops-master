@@ -9,7 +9,6 @@
 void arm_init();
 
 void arm_irq()__attribute((interrupt));
-void testfunc();
 void arm_fiq();
 void arm_abort();
 
